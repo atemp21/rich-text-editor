@@ -1,0 +1,28 @@
+#rich-text-editor-toolbar{
+    display: flex;
+    flex-direction: row;
+
+}
+#rich-text-editor:focus{
+    outline: 0;
+}
+
+#rich-text-editor{
+    border: 1px solid lightgray;
+}
+.editor-button{
+    height: 40px;
+    width: 40px;
+    background-color: white;
+    border: 1px solid lightgray;
+}
+
+.editor-button.active{
+    background-color: #e0edff;
+}
+.editor-button:focus{
+    outline: 0;
+}
+.editor-button:hover{
+    cursor: pointer;
+}
