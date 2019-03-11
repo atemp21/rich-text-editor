@@ -1,83 +1,75 @@
-export default class Toolbar{
+export default class Toolbar {
 
-    constructor(){
+    constructor() {
         this.toolbar = document.getElementById("rich-text-editor-toolbar");
+        this.buttons = [];
     }
 
-    setupToolbar(){
+    setupToolbar() {
         this.createButtons();
         this.toolbar.style.width = document.getElementById("rich-text-editor").style.width;
     }
 
-    createButtons(){
-        var bold = document.createElement("BUTTON");
-        bold.className = "editor-button";
-        bold.id = "bold-button";
-        this.toolbar.appendChild(bold);
- 
-        var italic = document.createElement("BUTTON");
-        italic.className = "editor-button";
-        italic.id = "italic-button";
-        this.toolbar.appendChild(italic);
- 
-        var underline = document.createElement("BUTTON");
-        underline.className = "editor-button";
-        underline.id = "underline-button";
-        this.toolbar.appendChild(underline);
- 
-        var fontSize = document.createElement("BUTTON");
-        fontSize.className = "editor-button";
-        fontSize.id = "fontSize-button";
-        this.toolbar.appendChild(fontSize);
- 
-        var fontFam = document.createElement("BUTTON");
-        fontFam.className = "editor-button";
-        fontFam.id = "fontFam-button";
-        this.toolbar.appendChild(fontFam);
- 
-        var format = document.createElement("BUTTON");
-        format.className = "editor-button";
-        format.id = "format-button";
-        this.toolbar.appendChild(format);
- 
-        var leftAlign = document.createElement("BUTTON");
-        leftAlign.className = "editor-button";
-        leftAlign.id = "leftAlign-button";
-        this.toolbar.appendChild(leftAlign);
- 
-        var middleAlign = document.createElement("BUTTON");
-        middleAlign.className = "editor-button";
-        middleAlign.id = "middleAlign-button";
-        this.toolbar.appendChild(middleAlign);
- 
-        var rightAlign = document.createElement("BUTTON");
-        rightAlign.className = "editor-button";
-        rightAlign.id = "rightAlign-button";
-        this.toolbar.appendChild(rightAlign);
- 
-        var olist = document.createElement("BUTTON");
-        olist.className = "editor-button";
-        olist.id = "olist-button";
-        this.toolbar.appendChild(olist);
- 
-        var ulist = document.createElement("BUTTON");
-        ulist.className = "editor-button";
-        ulist.id = "ulist-button";
-        this.toolbar.appendChild(ulist);  
-     }
+    createButtons() {
+        this.buttons.push(new Button("bold", "style", "font-weight: bold;", false));
+        this.buttons.push(new Button("italic", "style", "font-style: italic;", false));
+        this.buttons.push(new Button("underline", "style", "text-decoration: underline;", false));
+        this.buttons.push(new Button("left-align", "style", "text-align: left;", false));
+        this.buttons.push(new Button("middle-align", "style", "text-align: center;", false));
+        this.buttons.push(new Button("right-align", "style", "text-align: right;", true));
+        this.buttons.push(new Button("order-list", "tag", null, false));
+        this.buttons.push(new Button("unorder-list", "tag", null, false));
+        this.buttons.push(new Button("paragraph", "tag", null, true));
+        this.buttons.push(new Button("header", "tag", null, false));
 
-    }
 
-    class Button{
-        
-        constructor(){
+        for (let i = 0; i < this.buttons.length; i++) {
             
+            let b = document.createElement("BUTTON");
+            b.className = "editor-button";
+            b.id = this.buttons[i].name + "-button";
+            b.setAttribute('btn-type', this.buttons[i].type);
+            if (this.buttons[i].active == true) {
+                b.className = "editor-button active";
+            }
+            this.toolbar.appendChild(b);
+            b.addEventListener('click', ()=>{this.toggleActive(b);});
         }
     }
 
-    window.addEventListener('click', function(e){
-        if(e.target && e.target.className == 'editor-button' || e.target.className =='editor-button active'){
-            e.preventDefault();
-            e.target.classList.toggle("active");
+    isActive(button) {
+        if (button.classList == "active") {
+            return true;
         }
-    })
+        return false;
+    }
+
+    toggleActive(b) {
+       var t = document.getElementById(b.id).getAttribute("btn-type");
+        if (t == "tag") {
+            this.removeActiveFromTagButtons();
+        }
+        b.classList.toggle("active");
+    }
+
+    removeActiveFromTagButtons() {
+        for (var k = 0; k < this.buttons.length; k++) {
+            if (this.buttons[k].type == "tag") {  
+                console.log(this.buttons[k]);
+                document.getElementById(this.buttons[k].name+"-button").classList.remove("active");
+            }
+        }
+
+    }
+
+}
+
+class Button {
+
+    constructor(name, type, style, active) {
+        this.name = name;
+        this.type = type;
+        this.style = style;
+        this.active = active;
+    }
+}

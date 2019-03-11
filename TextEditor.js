@@ -17,7 +17,10 @@ export class TextEditor{
         this.bar.setupToolbar();
     }
 
-    
+    handleKey(e){
+        var char = String.fromCharCode(e.keyCode);
+        
+    }
 
     
 
@@ -28,10 +31,6 @@ const richEditor = new TextEditor();
 
 window.addEventListener("keypress",
     function (e) {
-        editor.passKey(e);
+        richEditor.handleKey(e);
     });
 
-window.addEventListener("keydown",
-    function (e) {
-        editor.passKey(e);
-    });
