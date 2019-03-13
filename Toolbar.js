@@ -11,16 +11,16 @@ export default class Toolbar {
     }
 
     createButtons() {
-        this.buttons.push(new Button("bold", "style", "font-weight: bold;", false));
-        this.buttons.push(new Button("italic", "style", "font-style: italic;", false));
-        this.buttons.push(new Button("underline", "style", "text-decoration: underline;", false));
-        this.buttons.push(new Button("left-align", "style", "text-align: left;", false));
-        this.buttons.push(new Button("middle-align", "style", "text-align: center;", false));
-        this.buttons.push(new Button("right-align", "style", "text-align: right;", true));
-        this.buttons.push(new Button("order-list", "tag", null, false));
-        this.buttons.push(new Button("unorder-list", "tag", null, false));
-        this.buttons.push(new Button("paragraph", "tag", null, true));
-        this.buttons.push(new Button("header", "tag", null, false));
+        this.buttons.push(new Button("bold", "style", "font-weight: bold;", false, "fas fa-bold"));
+        this.buttons.push(new Button("italic", "style", "font-style: italic;", false, "fas fa-italic"));
+        this.buttons.push(new Button("underline", "style", "text-decoration: underline;", false, "fas fa-underline"));
+        this.buttons.push(new Button("left-align", "align", "text-align: left;", true, "fas fa-align-left"));
+        this.buttons.push(new Button("middle-align", "align", "text-align: center;", false, "fas fa-align-center"));
+        this.buttons.push(new Button("right-align", "align", "text-align: right;", false, "fas fa-align-right"));
+        this.buttons.push(new Button("order-list", "tag", null, false, "fas fa-list-ol"));
+        this.buttons.push(new Button("unorder-list", "tag", null, false, "fas fa-list"));
+        this.buttons.push(new Button("paragraph", "tag", null, true, "fas fa-paragraph"));
+        this.buttons.push(new Button("header", "tag", null, false, "fas fa-heading"));
 
 
         for (let i = 0; i < this.buttons.length; i++) {
@@ -32,44 +32,53 @@ export default class Toolbar {
             if (this.buttons[i].active == true) {
                 b.className = "editor-button active";
             }
+            let icon = document.createElement("i");
+            icon.className = this.buttons[i].icon;
+            b.appendChild(icon);
             this.toolbar.appendChild(b);
-            b.addEventListener('click', ()=>{this.toggleActive(b);});
+            b.addEventListener('click', ()=>{this.toggleActive(this.buttons[i]);});
         }
-    }
-
-    isActive(button) {
-        if (button.classList == "active") {
-            return true;
-        }
-        return false;
     }
 
     toggleActive(b) {
-       var t = document.getElementById(b.id).getAttribute("btn-type");
-        if (t == "tag") {
-            this.removeActiveFromTagButtons();
+        if (b.type == "tag") {
+            this.removeActiveFromTagButtons(b.name);
         }
-        b.classList.toggle("active");
+        if(b.type == "align"){
+            this.removeActiveFromAligns(b.name);
+        }
+        b.active = b.active ? false : true;
+        document.getElementById(b.name+"-button").classList.toggle("active");
     }
 
-    removeActiveFromTagButtons() {
+    removeActiveFromTagButtons(name) {
         for (var k = 0; k < this.buttons.length; k++) {
-            if (this.buttons[k].type == "tag") {  
-                console.log(this.buttons[k]);
+            if (this.buttons[k].type == "tag" && this.buttons[k].name != name) {  
                 document.getElementById(this.buttons[k].name+"-button").classList.remove("active");
+                this.buttons[k].active = false;
             }
         }
+    }
 
+    removeActiveFromAligns(name){
+        for (var k = 0; k < this.buttons.length; k++) {
+            if (this.buttons[k].type == "align" && this.buttons[k].name != name) {  
+                document.getElementById(this.buttons[k].name+"-button").classList.remove("active");
+                this.buttons[k].active = false;
+
+            }
+        }
     }
 
 }
 
 class Button {
 
-    constructor(name, type, style, active) {
+    constructor(name, type, style, active, icon) {
         this.name = name;
         this.type = type;
         this.style = style;
         this.active = active;
+        this.icon = icon;
     }
 }

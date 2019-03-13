@@ -7,6 +7,13 @@
     outline: 0;
 }
 
+#rich-text-editor:hover{
+    cursor: text;
+}
+#rich-text-editor{
+    padding: 5px;
+}
+
 #rich-text-editor{
     border: 1px solid lightgray;
 }
@@ -18,7 +25,8 @@
 }
 
 .editor-button.active{
-    background-color: #e0edff;
+    background-color: #ababab;
+    border: 2px inset #cacaca;
 }
 .editor-button:focus{
     outline: 0;
