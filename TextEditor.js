@@ -7,6 +7,7 @@ export class TextEditor {
         this.editor = document.getElementById("rich-text-editor");
         this.bar = new Toolbar();
         this.focusedElement;
+        this.elementID = 0;
         this.init();
     }
 
@@ -14,10 +15,8 @@ export class TextEditor {
         this.editor.style.width = this.width;
         this.editor.style.height = this.height;
         this.bar.setupToolbar();
-        
-        let p = document.createElement("p");
-        p.contentEditable = true;
-        this.editor.appendChild(p);
+
+        this.createTag("", this.getActiveTags(), this.getActiveStyle());
 
         let tools = document.querySelectorAll(".editor-button");
         tools.forEach(t => {
@@ -29,19 +28,22 @@ export class TextEditor {
 
     handleKey(e) {
         let char = String.fromCharCode(e.keyCode);
-
         if (e.keyCode == 13) {
             e.preventDefault();
-            if(this.isList(this.focusedElement)){
+            if (this.isList(this.focusedElement) && this.focusedElement.innerHTML !== "") {
                 var li = document.createElement("li");
                 this.focusedElement.parentNode.appendChild(li);
                 this.focusedElement = this.focusedElement.parentNode.lastChild;
                 this.focusedElement.focus();
-            }else{
-            this.createTag(char, this.getActiveTags(), this.getActiveStyle());
-            this.editor.lastChild.focus();  
+            } else if (this.isList(this.focusedElement) && this.focusedElement.innerHTML === "") {
+                this.focusedElement.parentNode.removeChild(this.focusedElement);
+                this.createTag(char, this.getActiveTags(), this.getActiveStyle());
+                this.editor.lastChild.focus();
+            } else {
+                this.createTag(char, this.getActiveTags(), this.getActiveStyle());
+                this.editor.lastChild.focus();
             }
-            
+
         }
 
 
@@ -105,13 +107,20 @@ export class TextEditor {
             el.appendChild(li);
             el.style = style;
             el.contentEditable = true;
+            el.id = "editor-" + this.elementID;
             this.editor.appendChild(el);
+            this.focusedElement = el.lastChild;
         } else {
             el.style = style;
             el.innerHTML = char;
             el.contentEditable = true;
+            el.id = "editor-" + this.elementID;
             this.editor.appendChild(el);
+            this.focusedElement = el;
         }
+
+        this.elementID++;
+
 
     }
 
@@ -134,9 +143,7 @@ export class TextEditor {
             let parent = this.focusedElement.parentNode.parentNode;
             parent.replaceChild(newTag, this.focusedElement.parentNode);
             this.focusedElement = newTag.lastChild;
-
-        }
-        else if (newel == "order-list" || newel == "unorder-list") {
+        } else if (newel == "order-list" || newel == "unorder-list") {
             li = document.createElement("li");
             li.innerHTML = this.focusedElement.innerHTML;
             newTag.appendChild(li);
@@ -150,12 +157,13 @@ export class TextEditor {
                 newTag.innerHTML = this.getListContents(this.focusedElement);
                 let parent = this.focusedElement.parentNode.parentNode;
                 parent.replaceChild(newTag, this.focusedElement.parentNode);
-                this.focusedElement = newTag;
+                this.focusedElement = newTag.lastChild;
             } else {
 
                 newTag.innerHTML = this.focusedElement.innerHTML;
                 this.focusedElement.parentNode.replaceChild(newTag, this.focusedElement);
                 this.focusedElement = newTag;
+
             }
         }
     }
@@ -209,6 +217,60 @@ export class TextEditor {
         return items;
     }
 
+    getSectionStyle() {
+        let tag = this.focusedElement.tagName;
+        let style = this.focusedElement.style.cssText;
+
+        let activeTag;
+        switch (tag) {
+            case "P":
+                activeTag = "paragraph";
+                break;
+            case "H1":
+                activeTag = "header";
+                break;
+            case "OL":
+                activeTag = "order-list";
+                break;
+            case "UL":
+                activeTag = "unorder-list";
+                break;
+        }
+
+        this.bar.buttons.forEach(b => {
+            if (b.type == "tag" && b.name == activeTag) {
+                this.bar.toggleActive(b);
+            }
+            if (b.type == "style" || b.type == "align") {
+                if (style.includes(b.style)) this.bar.toggleActive(b);
+            }
+        });
+    }
+
+    handleNonLetterKeys(e) {
+
+        switch (e.keyCode) {
+            case 37: //left arrow
+            case 38: //up arrow
+            case 39: //right arrow
+            case 40: //down arrow
+                break;
+            case 16: //shift
+                break;
+            case 9: //tab
+                break;
+        }
+    }
+
+    focusChild() {
+        let children = this.editor.children;
+        for (var i = 0; i < children.length; i++) {
+            if(this.focusedElement.id == children[i].id){
+                document.getElementById(children[i].id).focus();
+            }
+        }
+    }
+
 
 }
 
@@ -219,6 +281,10 @@ window.addEventListener("keypress",
         richEditor.handleKey(e);
     });
 
+window.addEventListener('keydown', function (e) {
+    richEditor.handleNonLetterKeys(e);
+})
+
 window.addEventListener('click', function (e) {
     let editor = document.getElementById('rich-text-editor');
     if (e.target == editor) {
@@ -228,5 +294,6 @@ window.addEventListener('click', function (e) {
     }
     if (e.target.parentNode == editor) {
         richEditor.focusedElement = e.target;
+        richEditor.getSectionStyle();
     }
 });

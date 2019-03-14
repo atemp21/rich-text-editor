@@ -7,6 +7,10 @@
     outline: 0;
 }
 
+#rich-text-editor *:focus{
+    outline: 0;
+}
+
 #rich-text-editor:hover{
     cursor: text;
 }
