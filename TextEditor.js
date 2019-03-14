@@ -14,7 +14,7 @@ export class TextEditor {
         this.editor.style.width = this.width;
         this.editor.style.height = this.height;
         this.bar.setupToolbar();
-
+        
         let p = document.createElement("p");
         p.contentEditable = true;
         this.editor.appendChild(p);
@@ -32,8 +32,16 @@ export class TextEditor {
 
         if (e.keyCode == 13) {
             e.preventDefault();
+            if(this.isList(this.focusedElement)){
+                var li = document.createElement("li");
+                this.focusedElement.parentNode.appendChild(li);
+                this.focusedElement = this.focusedElement.parentNode.lastChild;
+                this.focusedElement.focus();
+            }else{
             this.createTag(char, this.getActiveTags(), this.getActiveStyle());
-            this.editor.lastChild.focus();
+            this.editor.lastChild.focus();  
+            }
+            
         }
 
 
@@ -114,7 +122,21 @@ export class TextEditor {
         let newTag = document.createElement(this.getTagType(newel));
         newTag.style = style;
         var li;
-        if (newel == "order-list" || newel == "unorder-list") {
+        if ((newel == "order-list" && this.isList(this.focusedElement)) ||
+            (newel == "unorder-list" && this.isList(this.focusedElement))) {
+            var list = this.listToList(this.focusedElement.parentNode.childNodes);
+            list.forEach(item => {
+                var li = document.createElement("li");
+                li.innerHTML = item.innerHTML;
+                newTag.appendChild(li);
+            });
+            newTag.contentEditable = true;
+            let parent = this.focusedElement.parentNode.parentNode;
+            parent.replaceChild(newTag, this.focusedElement.parentNode);
+            this.focusedElement = newTag.lastChild;
+
+        }
+        else if (newel == "order-list" || newel == "unorder-list") {
             li = document.createElement("li");
             li.innerHTML = this.focusedElement.innerHTML;
             newTag.appendChild(li);
@@ -177,6 +199,14 @@ export class TextEditor {
         text = text.replace(/<li>/gi, "");
         text = text.replace("</li>", "");
         return text;
+    }
+
+    listToList(arr) {
+        var items = [];
+        arr.forEach(i => {
+            items.push(i);
+        });
+        return items;
     }
 
 
