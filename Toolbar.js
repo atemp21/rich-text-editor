@@ -39,7 +39,7 @@ export default class Toolbar {
             b.addEventListener('click', ()=>{this.toggleActive(this.buttons[i]);});
         }
     }
-
+    //toggles the active state of the tool button
     toggleActive(b) {
         if (b.type == "tag") {
             this.removeActiveFromTagButtons(b.name);
@@ -50,7 +50,8 @@ export default class Toolbar {
         b.active = b.active ? false : true;
         document.getElementById(b.name+"-button").classList.toggle("active");
     }
-
+    //removes active css class and active property from tool button
+    //so only one tag can be active
     removeActiveFromTagButtons(name) {
         for (var k = 0; k < this.buttons.length; k++) {
             if (this.buttons[k].type == "tag" && this.buttons[k].name != name) {  
@@ -59,7 +60,8 @@ export default class Toolbar {
             }
         }
     }
-
+        //removes active css class and active property from tool button
+        //so only one align can be active
     removeActiveFromAligns(name){
         for (var k = 0; k < this.buttons.length; k++) {
             if (this.buttons[k].type == "align" && this.buttons[k].name != name) {  

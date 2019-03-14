@@ -5,12 +5,14 @@ export class TextEditor {
         this.width = width || 500;
         this.height = height || 500;
         this.editor = document.getElementById("rich-text-editor");
-        this.bar = new Toolbar();
-        this.focusedElement;
-        this.elementID = 0;
+        this.bar = new Toolbar();// toolbar
+        this.focusedElement;//element that will be focused
+        this.elementID = 0;// element id increment
         this.init();
     }
 
+    //initialize the editor and a a default <p> element and
+    //event listeners on tool buttons
     init() {
         this.editor.style.width = this.width;
         this.editor.style.height = this.height;
@@ -26,9 +28,10 @@ export class TextEditor {
         });
     }
 
+    //handles a letter key press based on element type
     handleKey(e) {
         let char = String.fromCharCode(e.keyCode);
-        if (e.keyCode == 13) {
+        if (e.keyCode == 13) {//enter key
             e.preventDefault();
             if (this.isList(this.focusedElement) && this.focusedElement.innerHTML !== "") {
                 var li = document.createElement("li");
@@ -48,7 +51,7 @@ export class TextEditor {
 
 
     }
-
+    //returns the active tool buttons of type tag (html tags)
     getActiveTags() {
         let tag = "";
         this.bar.buttons.forEach(button => {
@@ -60,7 +63,7 @@ export class TextEditor {
         });
         return tag;
     }
-
+    //returns the active style tool buttons (css)
     getActiveStyle() {
 
         let style = "";
@@ -73,7 +76,7 @@ export class TextEditor {
         });
         return style;
     }
-
+    //creates a new html tag based on active tools
     createTag(char, tag, style) {
 
         let el;
@@ -123,7 +126,7 @@ export class TextEditor {
 
 
     }
-
+    //updates the focused elements css, and tag
     updateStyle(e) {
         e.preventDefault();
         let newel = this.getActiveTags();
@@ -168,6 +171,7 @@ export class TextEditor {
         }
     }
 
+    //returns the tag type in html format of the given element
     getTagType(tag) {
         let el;
         switch (tag) {
@@ -200,7 +204,7 @@ export class TextEditor {
         if (el.tagName == "LI") return true;
         return false;
     }
-
+    // gets the contents of a list elements <li>'s (ul or ol)
     getListContents(el) {
         let parent = el.parentNode;
         let text = parent.innerHTML;
@@ -208,7 +212,7 @@ export class TextEditor {
         text = text.replace("</li>", "");
         return text;
     }
-
+    //returns an array of <li>'s content for easy list to list conversions
     listToList(arr) {
         var items = [];
         arr.forEach(i => {
@@ -216,7 +220,7 @@ export class TextEditor {
         });
         return items;
     }
-
+    //changes the active buttons when an element is clicked
     getSectionStyle() {
         let tag = this.focusedElement.tagName;
         let style = this.focusedElement.style.cssText;
@@ -246,7 +250,7 @@ export class TextEditor {
             }
         });
     }
-
+    //handle non letter keys
     handleNonLetterKeys(e) {
 
         switch (e.keyCode) {
@@ -261,7 +265,7 @@ export class TextEditor {
                 break;
         }
     }
-
+    //change the focus in the editor
     focusChild() {
         let children = this.editor.children;
         for (var i = 0; i < children.length; i++) {
